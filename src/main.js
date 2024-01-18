@@ -33,20 +33,15 @@ form.addEventListener('submit', onClick);
 function onClick(e) {
     e.preventDefault();
 
-    if (inputValue.trim() === '') {
-        iziToast.error({ title: 'Error', message: 'Please, type a search query' });
-        photoLoader.classList.remove('loader'); 
-        return;
-    }
-
-    photoLoader.classList.add('loader');
-
     fetch(`${BASIC_URL}?key=${KEY}&q=${inputValue}&image_type=photo&orientation=horizontal&safesearch=true`)
-        .then(res => res.json())
+        .then(res => res.json())      
         .then(images => {
+            if (inputValue.trim() === '') return iziToast.error({ title: 'Error', message: 'Please, type a search query' });
             if (images.total === 0) return iziToast.error({ title: 'Error', message: 'Sorry, there are no images matching your search query. Please try again!' })
-           
+            
             const imagePromises = images.hits.map(img => loadImage(img.webformatURL));
+            
+            photoLoader.classList.add('loader');
 
             Promise.all(imagePromises)
                 .then(() => {
